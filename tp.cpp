@@ -51,7 +51,6 @@ GLuint vertexbuffer;
 GLuint elementbuffer;
 GLuint LightID;
 
-
 std::vector<unsigned short> indices; //Triangles concaténés dans une liste
 std::vector<std::vector<unsigned short> > triangles;
 std::vector<glm::vec3> indexed_vertices;
@@ -133,6 +132,8 @@ void initLight () {
     glEnable (GL_LIGHTING);
 }
 
+glm::mat4 modifModelMatrix;
+
 void init () {
     // camera.resize (SCREENWIDTH, SCREENHEIGHT);
     initLight ();
@@ -144,6 +145,20 @@ void init () {
     glEnable(GL_COLOR_MATERIAL);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    /*modelMatrixModif = glm::mat4(0.f);
+    modelMatrixModif[0][0] = 1.f;
+    modelMatrixModif[1][1] = 1.f;
+    modelMatrixModif[2][2] = 1.f;
+    modelMatrixModif[3][3] = 1.f;
+
+    viewlMatrix = glm::mat4(0.f);
+    viewlMatrix[0][0] = 1.f;
+    viewlMatrix[1][1] = 1.f;
+    viewlMatrix[2][2] = 1.f;
+    viewlMatrix[3][3] = 1.f;*/
+
+    modifModelMatrix = glm::mat4(1.f);
+
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
     if (glewInit() != GLEW_OK) {
@@ -154,8 +169,6 @@ void init () {
 }
 
 
-
-
 // ------------------------------------
 // rendering.
 // ------------------------------------
@@ -163,14 +176,27 @@ void init () {
 void draw () {
     glUseProgram(programID);
     // Model matrix : an identity matrix (model will be at the origin) then change
+    /*glm::mat4 modelMatrix = glm::mat4(1.f);
+    modelMatrix = glm::rotate(modelMatrix, position, 20);*/
+    glm::mat4 modelMatrix;
+    modelMatrix = glm::mat4(1.f);
+    modelMatrix = glm::translate(modelMatrix, Vec3(-1.f, -1.f, 0.f));
+    //modelMatrix = glm::scale(modelMatrix, Vec3(.5f, .5f, .5f));
 
     // View matrix : camera/view transformation lookat() utiliser camera_position camera_target camera_up
+    glm::mat4 viewMatrix;// = glm::mat4(1.f);
+    viewMatrix = glm::lookAt(camera_position, camera_target, camera_up);
 
     // Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    glm::mat4 projectionMatrix;// = glm::mat4(1.f);
+    projectionMatrix = glm::perspective(glm::radians(45.f), 4.0f/3.0f, 0.1f, 100.0f);
 
     // Send our transformation to the currently bound shader,
     // in the "Model View Projection" to the shader uniforms
 
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "viewTransformation"), 1 , GL_FALSE, &viewMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "projectionTransformation"), 1 , GL_FALSE, &projectionMatrix[0][0]);
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -238,6 +264,78 @@ void key (unsigned char keyPressed, int x, int y) {
 
     case 'w':
         camera_position += cameraSpeed * camera_target;
+        break;
+
+
+    case 'a':
+        modifModelMatrix = translate(modifModelMatrix, vec3(0.5f, 0.f, 0.f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'b':
+        modifModelMatrix = translate(modifModelMatrix, vec3(0.f, 0.5f, 0.f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'c':
+        modifModelMatrix = translate(modifModelMatrix, vec3(0.f, 0.f, 0.5f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'd':
+        modifModelMatrix = translate(modifModelMatrix, vec3(-0.5f, 0.f, 0.f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'e':
+        modifModelMatrix = translate(modifModelMatrix, vec3(0.f, -0.5f, 0.f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'g':
+        modifModelMatrix = translate(modifModelMatrix, vec3(0.f, 0.f, -0.5f));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'h':
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(1, 0, 0));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'i':
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 1, 0));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'j':
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 0, 1));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+     case 'k':
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(1, 0, 0));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'l':
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 1, 0));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case 'm':
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 0, 1));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+
+    case '-': //Press + key to increase scale
+        modifModelMatrix = scale(modifModelMatrix, vec3(0.5, 0.5, 0.5));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+        break;
+
+    case '+': //Press - key to decrease scale
+        modifModelMatrix = scale(modifModelMatrix, vec3(1.5, 1.5, 1.5));
+        glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
     default:
