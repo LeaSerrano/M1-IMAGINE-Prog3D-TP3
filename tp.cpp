@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <math.h>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -145,18 +146,6 @@ void init () {
     glEnable(GL_COLOR_MATERIAL);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    /*modelMatrixModif = glm::mat4(0.f);
-    modelMatrixModif[0][0] = 1.f;
-    modelMatrixModif[1][1] = 1.f;
-    modelMatrixModif[2][2] = 1.f;
-    modelMatrixModif[3][3] = 1.f;
-
-    viewlMatrix = glm::mat4(0.f);
-    viewlMatrix[0][0] = 1.f;
-    viewlMatrix[1][1] = 1.f;
-    viewlMatrix[2][2] = 1.f;
-    viewlMatrix[3][3] = 1.f;*/
-
     modifModelMatrix = glm::mat4(1.f);
 
     // Initialize GLEW
@@ -175,26 +164,25 @@ void init () {
 
 void draw () {
     glUseProgram(programID);
+    glm::mat4 modelMatrix, viewMatrix, projectionMatrix;
+
     // Model matrix : an identity matrix (model will be at the origin) then change
-    /*glm::mat4 modelMatrix = glm::mat4(1.f);
-    modelMatrix = glm::rotate(modelMatrix, position, 20);*/
-    glm::mat4 modelMatrix;
-    modelMatrix = glm::mat4(1.f);
-    modelMatrix = glm::translate(modelMatrix, Vec3(-1.f, -1.f, 0.f));
-    //modelMatrix = glm::scale(modelMatrix, Vec3(.5f, .5f, .5f));
+
+    //Ex3
+    /*modelMatrix = glm::translate(modelMatrix, Vec3(-1.f, -1.f, 0.f));
+    modelMatrix = glm::scale(modelMatrix, Vec3(.5f, .5f, .5f));*/
 
     // View matrix : camera/view transformation lookat() utiliser camera_position camera_target camera_up
-    glm::mat4 viewMatrix;// = glm::mat4(1.f);
     viewMatrix = glm::lookAt(camera_position, camera_target, camera_up);
 
     // Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    glm::mat4 projectionMatrix;// = glm::mat4(1.f);
     projectionMatrix = glm::perspective(glm::radians(45.f), 4.0f/3.0f, 0.1f, 100.0f);
 
     // Send our transformation to the currently bound shader,
     // in the "Model View Projection" to the shader uniforms
 
-    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+    //glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(programID, "viewTransformation"), 1 , GL_FALSE, &viewMatrix[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(programID, "projectionTransformation"), 1 , GL_FALSE, &projectionMatrix[0][0]);
 
@@ -223,7 +211,30 @@ void draw () {
 
     // Afficher une seconde chaise
 
+    /*modelMatrix = glm::translate(modelMatrix, Vec3(4.f, 0.f, 0.f));
+    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
+    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
+    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
+
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
+
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );*/
+
     // Afficher une troisieme chaise!
+
+    /*glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );*/
 
     glDisableVertexAttribArray(0);
 }
@@ -298,32 +309,32 @@ void key (unsigned char keyPressed, int x, int y) {
         break;
 
     case 'h':
-        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(1, 0, 0));
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0.5, 0, 0));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
     case 'i':
-        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 1, 0));
+        modifModelMatrix = rotate(modifModelMatrix, 90.f, glm::vec3(0, 0.5, 0));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
     case 'j':
-        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 0, 1));
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 0, 0.5));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
      case 'k':
-        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(1, 0, 0));
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0.5, 0, 0));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
     case 'l':
-        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 1, 0));
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 0.5, 0));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
     case 'm':
-        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 0, 1));
+        modifModelMatrix = rotate(modifModelMatrix, -1.f, glm::vec3(0, 0, 0.5));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
@@ -400,7 +411,7 @@ void motion (int x, int y) {
 }
 
 void computeMatricesFromInputs(float moveX, float moveY){
-    std::cout << moveX << " " << moveY << std::endl;
+    //std::cout << moveX << " " << moveY << std::endl;
 	// Compute new orientation
 	horizontalAngle += mouseSpeed * moveX / 10.f;
 	verticalAngle   += mouseSpeed * moveY / 10.f;
@@ -454,7 +465,7 @@ int main (int argc, char ** argv) {
     programID = LoadShaders( "vertex_shader.glsl", "fragment_shader.glsl" );
 
     //Chargement du fichier de maillage
-    std::string filename("data/chair.off");
+    std::string filename("data/suzanne.off");
     loadOFF(filename, indexed_vertices, indices, triangles );
 
     // Load it into a VBO
