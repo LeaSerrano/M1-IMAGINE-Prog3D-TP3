@@ -230,10 +230,13 @@ void draw () {
                 indices.size(),    // count
                 GL_UNSIGNED_SHORT,   // type
                 (void*)0           // element array buffer offset
-                );
+                );*/
 
     // Afficher une troisieme chaise!
-    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+    /*glm::mat4 modelMatrix3;
+    modelMatrix3 = translate(modelMatrix3, vec3(0.5f, 0.5f, 0.f));
+    modelMatrix3 = rotate(modelMatrix3, 1.f, glm::vec3(0, 0, 0.5));*/
+    /*glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
 
     glDrawElements(
                 GL_TRIANGLES,      // mode
@@ -242,13 +245,43 @@ void draw () {
                 (void*)0           // element array buffer offset
                 );*/
 
+
+    //Ex2
+    /*glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );*/
+
+
     //Ex3 : système solaire
-    glm::mat4 modelMatrixEarth, modelMatrixMoon;
+    glm::mat4 modelMatrixSun, modelMatrixEarth, modelMatrixMoon;
     timeCst += deltaTime;
 
-    modelMatrixEarth = scale(modelMatrixEarth, glm::vec3(0.63f, 0.63f, 0.63f));
-    modelMatrixEarth = rotate(modelMatrixEarth, 23.44f, glm::vec3(1, 0, 0));
-    modelMatrixEarth = rotate(modelMatrixEarth, timeCst, glm::vec3(0, 1, 0));//rotation de la terre sur elle-même
+    modelMatrixSun = scale(modelMatrixSun, glm::vec3(0.5f, 0.5f, 0.5f));
+
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrixSun[0][0]);
+
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );
+
+
+
+    modelMatrixEarth = scale(modelMatrixEarth, glm::vec3(0.2f, 0.2f, 0.2f));
+    
+    modelMatrixEarth = rotate(modelMatrixEarth, timeCst, glm::vec3(0, 1, 0));
+    modelMatrixEarth = translate(modelMatrixEarth, glm::vec3(0, 0, 4.f));
+
+    modelMatrixEarth = rotate(modelMatrixEarth, 23.44f, glm::vec3(0, 0, 1));
+    modelMatrixEarth = rotate(modelMatrixEarth, timeCst, glm::vec3(0, 1, 0));
+
 
     glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrixEarth[0][0]);
     
@@ -259,13 +292,14 @@ void draw () {
                 (void*)0           // element array buffer offset
                 );    
 
-    modelMatrixMoon = scale(modelMatrixMoon, glm::vec3(0.1738f, 0.1738f, 0.1738f));
-    modelMatrixMoon = rotate(modelMatrixMoon, 5.14f, glm::vec3(1, 0, 0)); 
-    modelMatrixMoon = rotate(modelMatrixMoon, timeCst, glm::vec3(0, 1, 0));//rotation de la lune autour de le terre
-    modelMatrixMoon = translate(modelMatrixMoon, glm::vec3(7.f, 0, 0));
 
-    modelMatrixMoon = rotate(modelMatrixMoon, 6.68f, glm::vec3(1, 0, 0));
-    modelMatrixMoon = rotate(modelMatrixMoon, timeCst, glm::vec3(0, 1, 0));//rotation de la lune sur elle-même
+    modelMatrixMoon = scale(modelMatrixMoon, glm::vec3(0.09f, 0.09f, 0.09f));
+
+    modelMatrixMoon = rotate(modelMatrixMoon, 6.68f, glm::vec3(0, 0, 1));
+    modelMatrixMoon = rotate(modelMatrixMoon, timeCst, glm::vec3(0, 1, 0));
+
+    modelMatrixMoon = translate(modelMatrixMoon, glm::vec3(0, 0, 7.f));
+    
 
     glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrixMoon[0][0]);
 
