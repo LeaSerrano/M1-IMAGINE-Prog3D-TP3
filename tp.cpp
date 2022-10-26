@@ -30,6 +30,9 @@ glm::vec3 camera_position   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 camera_target = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 camera_up    = glm::vec3(0.0f, 1.0f,  0.0f);
 
+//
+glm::vec3 camera_target_lateral = glm::vec3(-1.0f, 0.0f, 0.0f);
+
 // timing
 float deltaTime = 0.1f;	// time between current frame and last frame
 float lastFrame = 0.0f;
@@ -144,7 +147,7 @@ void init () {
     glEnable (GL_DEPTH_TEST);
     glClearColor (0.2f, 0.2f, 0.3f, 1.0f);
     glEnable(GL_COLOR_MATERIAL);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     modifModelMatrix = glm::mat4(1.f);
 
@@ -162,15 +165,11 @@ void init () {
 // rendering.
 // ------------------------------------
 
+float timeCst = 0;
+
 void draw () {
     glUseProgram(programID);
-    glm::mat4 modelMatrix, viewMatrix, projectionMatrix;
-
-    // Model matrix : an identity matrix (model will be at the origin) then change
-
-    //Ex3
-    /*modelMatrix = glm::translate(modelMatrix, Vec3(-1.f, -1.f, 0.f));
-    modelMatrix = glm::scale(modelMatrix, Vec3(.5f, .5f, .5f));*/
+    glm::mat4 modelMatrix, modelMatrix2, viewMatrix, projectionMatrix;
 
     // View matrix : camera/view transformation lookat() utiliser camera_position camera_target camera_up
     viewMatrix = glm::lookAt(camera_position, camera_target, camera_up);
@@ -181,10 +180,9 @@ void draw () {
     // Send our transformation to the currently bound shader,
     // in the "Model View Projection" to the shader uniforms
 
-    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
-    //glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(programID, "viewTransformation"), 1 , GL_FALSE, &viewMatrix[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(programID, "projectionTransformation"), 1 , GL_FALSE, &projectionMatrix[0][0]);
+
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -198,6 +196,15 @@ void draw () {
                 (void*)0            // array buffer offset
                 );
 
+    // Model matrix : an identity matrix (model will be at the origin) then change
+
+    //Ex1
+    /*modelMatrix = glm::translate(modelMatrix, Vec3(-1.2f, -1.f, 0.f));
+    modelMatrix = glm::scale(modelMatrix, Vec3(.5f, .5f, .5f));
+
+    //glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
+
     // Index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
@@ -210,24 +217,23 @@ void draw () {
                 );
 
     // Afficher une seconde chaise
+    modelMatrix2 = glm::translate(modelMatrix2, Vec3(1.2f, -1.f, 0.f));
+    modelMatrix2 = glm::scale(modelMatrix2, Vec3(.5f, .5f, .5f));
+    modelMatrix2 = glm::rotate(modelMatrix2, 1.f, glm::vec3(0, 1, 0));
+    modelMatrix2 = glm::rotate(modelMatrix2, 1.f, glm::vec3(0, 1, 0));
+    modelMatrix2 = glm::rotate(modelMatrix2, 1.f, glm::vec3(0, 1, 0));
 
-    /*modelMatrix = glm::translate(modelMatrix, Vec3(4.f, 0.f, 0.f));
-    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
-    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
-    modelMatrix = glm::rotate(modelMatrix, 1.f, glm::vec3(0, 1, 0));
-
-    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrix2[0][0]);
 
     glDrawElements(
                 GL_TRIANGLES,      // mode
                 indices.size(),    // count
                 GL_UNSIGNED_SHORT,   // type
                 (void*)0           // element array buffer offset
-                );*/
+                );
 
     // Afficher une troisieme chaise!
-
-    /*glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
 
     glDrawElements(
                 GL_TRIANGLES,      // mode
@@ -235,6 +241,40 @@ void draw () {
                 GL_UNSIGNED_SHORT,   // type
                 (void*)0           // element array buffer offset
                 );*/
+
+    //Ex3 : système solaire
+    glm::mat4 modelMatrixEarth, modelMatrixMoon;
+    timeCst += deltaTime;
+
+    modelMatrixEarth = scale(modelMatrixEarth, glm::vec3(0.63f, 0.63f, 0.63f));
+    modelMatrixEarth = rotate(modelMatrixEarth, 23.44f, glm::vec3(1, 0, 0));
+    modelMatrixEarth = rotate(modelMatrixEarth, timeCst, glm::vec3(0, 1, 0));//rotation de la terre sur elle-même
+
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrixEarth[0][0]);
+    
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );    
+
+    modelMatrixMoon = scale(modelMatrixMoon, glm::vec3(0.1738f, 0.1738f, 0.1738f));
+    modelMatrixMoon = rotate(modelMatrixMoon, 5.14f, glm::vec3(1, 0, 0)); 
+    modelMatrixMoon = rotate(modelMatrixMoon, timeCst, glm::vec3(0, 1, 0));//rotation de la lune autour de le terre
+    modelMatrixMoon = translate(modelMatrixMoon, glm::vec3(7.f, 0, 0));
+
+    modelMatrixMoon = rotate(modelMatrixMoon, 6.68f, glm::vec3(1, 0, 0));
+    modelMatrixMoon = rotate(modelMatrixMoon, timeCst, glm::vec3(0, 1, 0));//rotation de la lune sur elle-même
+
+    glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modelMatrixMoon[0][0]);
+
+    glDrawElements(
+                GL_TRIANGLES,      // mode
+                indices.size(),    // count
+                GL_UNSIGNED_SHORT,   // type
+                (void*)0           // element array buffer offset
+                );
 
     glDisableVertexAttribArray(0);
 }
@@ -276,6 +316,14 @@ void key (unsigned char keyPressed, int x, int y) {
     case 'w':
         camera_position += cameraSpeed * camera_target;
         break;
+    
+    case 'z':
+        camera_position -= cameraSpeed * camera_target_lateral;
+        break;
+
+    case 'p':
+        camera_position += cameraSpeed * camera_target_lateral;
+        break;
 
 
     case 'a':
@@ -314,7 +362,7 @@ void key (unsigned char keyPressed, int x, int y) {
         break;
 
     case 'i':
-        modifModelMatrix = rotate(modifModelMatrix, 90.f, glm::vec3(0, 0.5, 0));
+        modifModelMatrix = rotate(modifModelMatrix, 1.f, glm::vec3(0, 0.5, 0));
         glUniformMatrix4fv(glGetUniformLocation(programID, "modelTransformation"), 1 , GL_FALSE, &modifModelMatrix[0][0]);
         break;
 
@@ -465,7 +513,7 @@ int main (int argc, char ** argv) {
     programID = LoadShaders( "vertex_shader.glsl", "fragment_shader.glsl" );
 
     //Chargement du fichier de maillage
-    std::string filename("data/suzanne.off");
+    std::string filename("data/sphere.off");
     loadOFF(filename, indexed_vertices, indices, triangles );
 
     // Load it into a VBO
